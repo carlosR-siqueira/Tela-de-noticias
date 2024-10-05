@@ -1,3 +1,16 @@
+
+<div align="center">
+
+Tela de Notícias
+
+https://github.com/user-attachments/assets/10609d6a-17cd-4ccd-9725-0405bc775cfa
+
+
+
+</div>
+
+
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
