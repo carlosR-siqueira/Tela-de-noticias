@@ -104,10 +104,10 @@ const App = () => {
         
           <Text>
           <LinearGradient
-          colors={['#FFFFFF','#00ADEF' ]} // Degradê de azul escuro para claro
-          start={[0, 0]} // Início do degradê (esquerda superior)
-          end={[1, 1]} // Fim do degradê (direita inferior)
-          style={styles.gradientButton}// Estilos do botão
+          colors={['#FFFFFF','#00ADEF' ]} 
+          start={[0, 0]} 
+          end={[1, 1]} 
+          style={styles.gradientButton}
         >
             <Ionicons style={styles.backButtonIcon} name="arrow-back" size={35} />
         </LinearGradient>
@@ -157,10 +157,10 @@ const App = () => {
     <TouchableOpacity key={category} onPress={() => setActiveCategory(category)}>
       {activeCategory === category ? (
         <LinearGradient
-          colors={['#F8F8FF', '#00ADEF']} // Degradê de azul escuro para claro
-          start={[0, 0]} // Início do degradê (esquerda superior)
-          end={[1, 1]} // Fim do degradê (direita inferior)
-          style={styles.activeCategoryButton} // Estilo para o botão ativo
+          colors={['#F8F8FF', '#00ADEF']} 
+          start={[0, 0]} 
+          end={[1, 1]} 
+          style={styles.activeCategoryButton} 
         >
           <Text style={styles.activeCategoryText}>{category}</Text>
         </LinearGradient>
