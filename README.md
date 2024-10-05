@@ -1,9 +1,13 @@
 
+<div align="center">
 
-<video>
-<source src="https://github.com/user-attachments/assets/2e53f07b-a1d6-4685-af0b-b00cffac879b"/>
-</video>
+Tela de Notícias
 
+https://github.com/user-attachments/assets/10609d6a-17cd-4ccd-9725-0405bc775cfa
+
+
+
+</div>
 
 
 
