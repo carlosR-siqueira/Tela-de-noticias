@@ -12,9 +12,7 @@ const Header: React.FC<HeaderProps> = ({ userName, userImage }) => {
     <View style={styles.headerContainer}>
       {/* Logo à esquerda */}
       <Image 
-        source={{
-            uri: 'https://scontent-gig4-1.cdninstagram.com/v/t51.2885-19/460285473_1051892146535588_1704474555675732952_n.jpg?stp=dst-jpg_s150x150&_nc_ht=scontent-gig4-1.cdninstagram.com&_nc_cat=108&_nc_ohc=w7wxfJU-UxYQ7kNvgHKbl-d&_nc_gid=a642592dcda0478993b55833da5dd2eb&edm=AEYEu-QBAAAA&ccb=7-5&oh=00_AYBVFStGUDTw1CX-sb6s4zx1175B5pHGDkdeOqf6WIjU_g&oe=67027590&_nc_sid=ead929'
-        }} // Substitua pelo caminho da sua logo
+        source={require('../assets/images/icon.png')} // Substitua pelo caminho da sua logo
         style={styles.logo}
       />
 

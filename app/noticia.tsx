@@ -1,34 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Dimensions, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Dimensions, ActivityIndicator, Linking, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+
+
 
 interface NewsItem {
   id: string;
   title: string;
   author: string;
-  date: string;
-  image: string;
-  category: string;
+  publishedAt: string;
+  urlToImage: string;
   url: string;
 }
 
 const { width } = Dimensions.get('window');
 
+const router = useRouter();
+
+
 const App = () => {
-  const [activeCategory, setActiveCategory] = useState<string>('Esporte');
   const [data, setData] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(0); // Para controlar o index ativo no carousel
+  const [activeCategory, setActiveCategory] = useState<string>('Esporte'); // Estado para a categoria ativa
 
   const categories: string[] = ['Esporte', 'Arte', 'Ciência', 'Tecnologia'];
 
   const fetchNewsData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://brainai-api.com/kago');
+      const response = await fetch('https://news-db86d-default-rtdb.asia-southeast1.firebasedatabase.app/.json'); // Altere para o endpoint correto
       const json = await response.json();
+   
+      
 
-      console.log('Dados recebidos da API:', json);
       setData(json.articles);
     } catch (err) {
       console.error(err);
@@ -42,15 +50,16 @@ const App = () => {
     fetchNewsData();
   }, []);
 
-  const filteredData = data.filter(item => item.category === activeCategory);
-  console.log('Dados filtrados:', filteredData);
+  const handleScroll = (event: any) => {
+    const index = Math.floor(event.nativeEvent.contentOffset.x / width);
+    setActiveIndex(index);
+  };
 
   const renderItem = ({ item }: { item: NewsItem }) => {
-    console.log('Renderizando item:', item);
     return (
       <TouchableOpacity onPress={() => Linking.openURL(item.url)}>
         <View style={styles.card}>
-          <Image source={{ uri: item.image }} style={styles.cardImage} />
+          <Image source={{ uri: item.urlToImage }} style={styles.cardImage} />
           <View style={styles.cardContent}>
             <Text style={styles.cardTitle}>{item.title}</Text>
             <Text style={styles.cardAuthor}>{item.author}</Text>
@@ -88,46 +97,84 @@ const App = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.backButton}>
+      
+
+        <TouchableOpacity onPress={() => router.back()}>
+
+        
+          <Text>
+          <LinearGradient
+          colors={['#FFFFFF','#00ADEF' ]} // Degradê de azul escuro para claro
+          start={[0, 0]} // Início do degradê (esquerda superior)
+          end={[1, 1]} // Fim do degradê (direita inferior)
+          style={styles.gradientButton}// Estilos do botão
+        >
             <Ionicons style={styles.backButtonIcon} name="arrow-back" size={35} />
+        </LinearGradient>
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity >
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>Notícias</Text>
         </View>
       </View>
 
-      <FlatList
-        data={filteredData}
-        renderItem={({ item }) => (
-          <View style={styles.carouselItem}>
-            <Image source={{ uri: item.image }} style={styles.carouselImage} />
-            <View style={styles.carouselContent}>
-              <Text style={styles.carouselDate}>{item.date}</Text>
-              <Text style={styles.carouselTitle}>{item.title}</Text>
-              <Text style={styles.carouselAuthor}>{item.author}</Text>
+      {/* Slide/Carousel de notícias */}
+      <ScrollView 
+        horizontal 
+        pagingEnabled 
+        showsHorizontalScrollIndicator={false} 
+        onScroll={handleScroll} 
+        scrollEventThrottle={16} 
+        style={styles.carousel}
+      >
+        {data.map((item, index) => (
+          <TouchableOpacity key={index} onPress={() => Linking.openURL(item.url)}>
+            <View style={styles.carouselItem}>
+              <Image source={{ uri: item.urlToImage }} style={styles.carouselImage} />
+              <View style={styles.carouselContent}>
+                <Text style={styles.carouselDate}>{item.publishedAt}</Text>
+                <Text style={styles.carouselTitle}>{item.title}</Text>
+                <Text style={styles.carouselAuthor}>{item.author}</Text>
+              </View>
             </View>
-          </View>
-        )}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        pagingEnabled
-      />
-
-      <View style={styles.categories}>
-        {categories.map((category) => (
-          <TouchableOpacity key={category} onPress={() => setActiveCategory(category)}>
-            <Text style={[styles.categoryText, activeCategory === category && styles.activeCategoryText]}>
-              {category}
-            </Text>
           </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Indicador de página */}
+      <View style={styles.indicatorContainer}>
+        {data.map((_, index) => (
+          <View
+            key={index}
+            style={[styles.indicator, activeIndex === index ? styles.activeIndicator : styles.inactiveIndicator]}
+          />
         ))}
       </View>
 
+      {/* Categorias exibidas para futuro uso */}
+      <View style={styles.categories}>
+  {categories.map((category) => (
+    <TouchableOpacity key={category} onPress={() => setActiveCategory(category)}>
+      {activeCategory === category ? (
+        <LinearGradient
+          colors={['#F8F8FF', '#00ADEF']} // Degradê de azul escuro para claro
+          start={[0, 0]} // Início do degradê (esquerda superior)
+          end={[1, 1]} // Fim do degradê (direita inferior)
+          style={styles.activeCategoryButton} // Estilo para o botão ativo
+        >
+          <Text style={styles.activeCategoryText}>{category}</Text>
+        </LinearGradient>
+      ) : (
+        <View>
+          <Text style={styles.categoryText}>{category}</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  ))}
+</View>
+      {/* Lista de notícias */}
       <FlatList
-        data={filteredData}
+        data={data}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         style={styles.list}
@@ -149,16 +196,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
-  backButton: {
-    backgroundColor: '#00ADEF',
-    width: 35,
-    height: 35,
-    borderRadius: 17.5,
-    lineHeight: 45,
-    textAlign: 'center',
+  gradientButton: {
+    flex:1,
+    width: 43,
+    height: 43,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  
   backButtonIcon: {
     color: '#fff',
+    fontSize:  24,
+
+    
   },
   headerTitle: {
     fontSize: 20,
@@ -182,45 +233,43 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
   },
-  carouselItem: {
-    width: width * 0.7,
-    marginRight: 10,
-  },
-  carouselImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-  },
-  carouselContent: {
-    marginTop: 10,
-  },
-  carouselTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  carouselAuthor: {
-    fontSize: 12,
-    color: '#999',
-  },
-  carouselDate: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 5,
-  },
   categories: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 15,
   },
   categoryText: {
+    backgroundColor: '#fff',
+    width: 75,
+    borderRadius: 50,
+    lineHeight: 45,
+    textAlign: 'center',
     fontSize: 16,
-    color: '#333',
+    
+    color: '#b7c3cc',
+    borderWidth:  1,
+    borderColor:  '#b7c3cc',
+
+
+    
   },
+  
+  activeCategoryButton: {
+    width: 75,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+ 
   activeCategoryText: {
-    color: '#00ADEF',
+    color: '#fff', // Cor do texto quando ativo
+    fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
+
   },
+  
   list: {
     paddingHorizontal: 16,
   },
@@ -254,6 +303,58 @@ const styles = StyleSheet.create({
   cardAuthor: {
     fontSize: 14,
     color: '#999',
+  },
+  // Estilos do Carousel/Slide
+  carousel: {
+    marginVertical: 10,
+  },
+  carouselItem: {
+    width: width * 0.7,
+    marginRight: 10,
+    marginLeft: 5,
+  },
+  carouselImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+  },
+  carouselContent: {
+    marginTop: 10,
+  },
+  carouselTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff', // Altere para branco
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+  carouselAuthor: {
+    fontSize: 12,
+    color: '#fff', // Altere para branco
+  },
+  carouselDate: {
+    fontSize: 12,
+    color: '#fff', // Altere para branco
+    marginBottom: 5,
+  },
+  // Estilos dos indicadores de página
+  indicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  indicator: {
+    height: 8,
+    width: 8,
+    borderRadius: 4,
+    marginHorizontal: 5,
+  },
+  activeIndicator: {
+    backgroundColor: '#00ADEF',
+  },
+  inactiveIndicator: {
+    backgroundColor: '#ccc',
   },
 });
 
