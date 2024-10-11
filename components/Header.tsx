@@ -1,10 +1,9 @@
-// components/Header.tsx
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
 interface HeaderProps {
   userName: string;
-  userImage: string; // URL da imagem do usuário
+  userImage: string; 
 }
 
 const Header: React.FC<HeaderProps> = ({ userName, userImage }) => {
@@ -12,7 +11,7 @@ const Header: React.FC<HeaderProps> = ({ userName, userImage }) => {
     <View style={styles.headerContainer}>
       {/* Logo à esquerda */}
       <Image 
-        source={require('../assets/images/icon.png')} // Substitua pelo caminho da sua logo
+        source={require('../assets/images/icon.png')} 
         style={styles.logo}
       />
 
@@ -23,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ userName, userImage }) => {
         <Text style={styles.userName}>{userName}</Text>
         </View>
         <Image 
-          source={{ uri: userImage }} // URL da imagem do usuário
+          source={{ uri: userImage }} 
           style={styles.userImage}
         />
       </View>

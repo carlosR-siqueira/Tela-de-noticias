@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Dimensions, ActivityIndicator, Linking, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-
+//components
+import  HeaderTitleComponent from '@/components/HeaderTitle'
+import  Categories from '@/components/Categories'
 
 interface NewsItem {
   id: string;
@@ -17,10 +18,8 @@ interface NewsItem {
 
 const { width } = Dimensions.get('window');
 
-const router = useRouter();
-
-
 const App = () => {
+  const router = useRouter(); // useRouter movido para dentro do componente
   const [data, setData] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,10 +33,9 @@ const App = () => {
       setLoading(true);
       const response = await fetch('https://news-db86d-default-rtdb.asia-southeast1.firebasedatabase.app/.json'); // Altere para o endpoint correto
       const json = await response.json();
-   
-      
+      console.log(json); // Verifique a estrutura dos dados retornados
 
-      setData(json.articles);
+      setData(json.articles || []);
     } catch (err) {
       console.error(err);
       setError('Erro ao carregar as notícias');
@@ -96,27 +94,7 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-      
-
-        <TouchableOpacity onPress={() => router.back()}>
-
-        
-          <Text>
-          <LinearGradient
-          colors={['#FFFFFF','#00ADEF' ]} 
-          start={[0, 0]} 
-          end={[1, 1]} 
-          style={styles.gradientButton}
-        >
-            <Ionicons style={styles.backButtonIcon} name="arrow-back" size={35} />
-        </LinearGradient>
-          </Text>
-        </TouchableOpacity >
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle}>Notícias</Text>
-        </View>
-      </View>
+      <HeaderTitleComponent />
 
       {/* Slide/Carousel de notícias */}
       <ScrollView 
@@ -152,26 +130,11 @@ const App = () => {
       </View>
 
       {/* Categorias exibidas para futuro uso */}
-      <View style={styles.categories}>
-  {categories.map((category) => (
-    <TouchableOpacity key={category} onPress={() => setActiveCategory(category)}>
-      {activeCategory === category ? (
-        <LinearGradient
-          colors={['#F8F8FF', '#00ADEF']} 
-          start={[0, 0]} 
-          end={[1, 1]} 
-          style={styles.activeCategoryButton} 
-        >
-          <Text style={styles.activeCategoryText}>{category}</Text>
-        </LinearGradient>
-      ) : (
-        <View>
-          <Text style={styles.categoryText}>{category}</Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  ))}
-</View>
+  
+      <GestureHandlerRootView style={styles.categoriesContainer}  >
+        <Categories />
+      </GestureHandlerRootView>
+
       {/* Lista de notícias */}
       <FlatList
         data={data}
@@ -184,42 +147,13 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+
+
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  gradientButton: {
-    flex:1,
-    width: 43,
-    height: 43,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  
-  backButtonIcon: {
-    color: '#fff',
-    fontSize:  24,
 
-    
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -233,43 +167,9 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
   },
-  categories: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  categoriesContainer: {
     paddingVertical: 15,
   },
-  categoryText: {
-    backgroundColor: '#fff',
-    width: 75,
-    borderRadius: 50,
-    lineHeight: 45,
-    textAlign: 'center',
-    fontSize: 16,
-    
-    color: '#b7c3cc',
-    borderWidth:  1,
-    borderColor:  '#b7c3cc',
-
-
-    
-  },
-  
-  activeCategoryButton: {
-    width: 75,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
- 
-  activeCategoryText: {
-    color: '#fff', // Cor do texto quando ativo
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-
-  },
-  
   list: {
     paddingHorizontal: 16,
   },
@@ -321,40 +221,35 @@ const styles = StyleSheet.create({
   carouselContent: {
     marginTop: 10,
   },
+  carouselDate: {
+    fontSize: 12,
+    color: '#999',
+  },
   carouselTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff', // Altere para branco
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
   },
   carouselAuthor: {
-    fontSize: 12,
-    color: '#fff', // Altere para branco
+    fontSize: 14,
+    color: '#999',
   },
-  carouselDate: {
-    fontSize: 12,
-    color: '#fff', // Altere para branco
-    marginBottom: 5,
-  },
-  // Estilos dos indicadores de página
   indicatorContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 10,
+    alignItems: 'center',
+    marginVertical: 10,
   },
   indicator: {
-    height: 8,
-    width: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     marginHorizontal: 5,
   },
   activeIndicator: {
     backgroundColor: '#00ADEF',
   },
   inactiveIndicator: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#ddd',
   },
 });
 
